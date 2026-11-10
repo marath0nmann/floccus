@@ -140,7 +140,9 @@
             </div>
           </v-col>
           <v-col>
-            <div class="d-flex flex-row-reverse">
+            <div
+              v-if="!managedLocked"
+              class="d-flex flex-row-reverse">
               <v-btn
                 class="primary"
                 @click="onSave">
@@ -153,8 +155,20 @@
                 mdi-check
               </v-icon>
             </div>
+            <v-alert
+              v-if="data.managedId"
+              type="info"
+              outlined
+              dense
+              class="mt-3">
+              <div class="font-weight-bold">
+                {{ t('LabelManagedAccount') }}
+              </div>
+              {{ managedLocked ? t('DescriptionManagedAccountLocked') : t('DescriptionManagedAccount') }}
+            </v-alert>
             <v-form
               v-if="!loading"
+              :disabled="managedLocked"
               class="mt-3 mb-3">
               <OptionsNextcloudFolders
                 v-if="data.type === 'nextcloud-folders' || data.type === 'nextcloud-bookmarks'"
@@ -202,7 +216,9 @@
                 @reset="onReset"
                 @delete="onDelete" />
             </v-form>
-            <div class="d-flex flex-row-reverse">
+            <div
+              v-if="!managedLocked"
+              class="d-flex flex-row-reverse">
               <v-btn
                 class="primary"
                 @click="onSave">
@@ -249,6 +265,12 @@ import OptionsGit from '../components/OptionsGit.vue'
 export default {
   name: 'AccountOptions',
   components: { OptionsGit, OptionsGoogleDrive, OptionsDropbox, OptionsFake, OptionsWebdav, OptionsS3, OptionsNextcloudFolders, OptionsLinkwarden, OptionsKarakeep },
+  provide() {
+    return {
+      // A function, because provided values aren't reactive in Vue 2
+      isManagedLocked: () => this.managedLocked,
+    }
+  },
   data() {
     return {
       folderName: '',
@@ -266,6 +288,9 @@ export default {
     },
     localRoot() {
       return this.data ? this.data.localRoot : null
+    },
+    managedLocked() {
+      return Boolean(this.data && this.data.managedLocked)
     },
     saved() {
       return this.savedData === JSON.stringify(this.data)
@@ -301,6 +326,7 @@ export default {
       this.folderName = pathArray[pathArray.length - 1]
     },
     async onDelete() {
+      if (this.managedLocked) return
       await this.$store.dispatch(actions.DELETE_ACCOUNT, this.id)
       this.deleted = true
     },

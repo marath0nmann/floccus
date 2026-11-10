@@ -681,6 +681,15 @@
   "DescriptionClientcert": {
     "message": "Enable this option if your server requires a client certificate or cookies for authentication. This may cause unintended side effects, as floccus will share cookies with your normal browser sessions."
   },
+  "LabelManagedAccount": {
+    "message": "Managed by your organization"
+  },
+  "DescriptionManagedAccount": {
+    "message": "This profile was set up by your administrator. You can change it, but the settings your administrator chose are restored whenever the policy is applied again."
+  },
+  "DescriptionManagedAccountLocked": {
+    "message": "This profile was set up by your administrator and cannot be changed or removed here."
+  },
   "LabelAllowredirects": {
     "message": "Allow redirects in Server URL"
   },

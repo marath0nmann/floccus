@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!isManagedLocked()">
     <div
       class="text-h6"
       role="heading"
@@ -22,6 +22,10 @@
 <script>
 export default {
   name: 'OptionDeleteAccount',
+  inject: {
+    // Profiles locked by a managed policy can't be removed, see AccountOptions
+    isManagedLocked: { default: () => () => false },
+  },
   methods: {
     onClick() {
       if (window.confirm('Do you really want to remove this account?')) {

@@ -11,6 +11,7 @@ import { STATUS_ALLGOOD, STATUS_DISABLED, STATUS_ERROR, STATUS_NEEDS_SYNC, STATU
 import { onWakeUp } from '../on-wake-up'
 import { i18n } from '../native/I18n'
 import { getDueAction, isNotifyOnly } from '../SyncSchedule'
+import { applyManagedPolicy } from './BrowserManagedPolicy'
 
 const INACTIVITY_TIMEOUT = 7 * 1000 // 7 seconds
 const NETWORK_SETTLE_TIMEOUT = 5 * 1000 // 5 seconds
@@ -24,7 +25,8 @@ class AlarmManager {
   }
 
   async checkStorage() {
-    // empty
+    // Also picks up policy changes that had to wait for a sync to finish
+    await this.ctl.applyManagedPolicy()
   }
 
   /**
@@ -251,6 +253,27 @@ export default class BrowserController {
 
     // Run some things on browser startup
     browser.runtime.onStartup.addListener(() => this.onStartup())
+
+    // Profiles configured by an administrator, see ManagedPolicy.ts
+    browser.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName === 'managed') {
+        this.applyManagedPolicy()
+      }
+    })
+    this.applyManagedPolicy()
+  }
+
+  async applyManagedPolicy() {
+    let changed = false
+    try {
+      changed = await applyManagedPolicy()
+    } catch (e) {
+      console.warn('Could not apply the managed policy', e)
+    }
+    if (changed) {
+      this.updateStatus()
+      setTimeout(() => this.alarms.checkSync(), 3000)
+    }
   }
 
   async _receiveEvent(data, sendResponse) {

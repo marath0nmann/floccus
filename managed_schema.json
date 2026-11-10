@@ -1,0 +1,102 @@
+{
+  "type": "object",
+  "properties": {
+    "accounts": {
+      "title": "Managed profiles",
+      "description": "Profiles floccus creates and keeps up to date. See doc/ManagedPolicy.md.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Identifier",
+            "description": "Stable identifier of this profile. Keep it unchanged across policy updates, or a new profile is created.",
+            "type": "string"
+          },
+          "type": {
+            "title": "Profile type",
+            "description": "The kind of server.",
+            "type": "string",
+            "enum": ["webdav", "nextcloud-bookmarks"]
+          },
+          "url": {
+            "title": "Server URL",
+            "type": "string"
+          },
+          "username": {
+            "title": "User name",
+            "description": "Optional. Passwords and passphrases cannot be set by policy.",
+            "type": "string"
+          },
+          "serverRoot": {
+            "title": "Server folder (Nextcloud Bookmarks)",
+            "type": "string"
+          },
+          "bookmark_file": {
+            "title": "Bookmarks file (WebDAV)",
+            "type": "string"
+          },
+          "bookmark_file_type": {
+            "title": "Bookmarks file format (WebDAV)",
+            "type": "string",
+            "enum": ["xbel", "html"]
+          },
+          "includeCredentials": {
+            "title": "Send client credentials",
+            "description": "Send client certificates and cookies with requests to the server.",
+            "type": "boolean"
+          },
+          "allowRedirects": {
+            "title": "Follow redirects",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Profile name",
+            "type": "string"
+          },
+          "localRootPreset": {
+            "title": "Local folder",
+            "description": "The browser folder to sync: the bookmarks bar, other bookmarks, the bookmarks menu (Firefox only) or all bookmarks.",
+            "type": "string",
+            "enum": ["toolbar", "other", "menu", "root"]
+          },
+          "strategy": {
+            "title": "Sync strategy",
+            "type": "string",
+            "enum": ["default", "slave", "overwrite"]
+          },
+          "enabled": {
+            "title": "Sync on local changes",
+            "type": "boolean"
+          },
+          "syncIntervalEnabled": {
+            "title": "Sync periodically",
+            "type": "boolean"
+          },
+          "syncInterval": {
+            "title": "Sync interval in minutes",
+            "type": "integer",
+            "minimum": 1
+          },
+          "syncOnStartupEnabled": {
+            "title": "Sync on browser startup",
+            "type": "boolean"
+          },
+          "failsafe": {
+            "title": "Failsafe",
+            "type": "boolean"
+          },
+          "nestedSync": {
+            "title": "Sync nested profiles",
+            "type": "boolean"
+          },
+          "lockSettings": {
+            "title": "Lock profile",
+            "description": "Users can neither change nor remove the profile.",
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

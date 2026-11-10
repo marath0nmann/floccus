@@ -33,6 +33,7 @@ const paths = {
     './lib/**',
     './_locales/**',
     'LICENSE.txt',
+    'managed_schema.json',
     'PRIVACY_POLICY.md',
     'README.md',
   ],

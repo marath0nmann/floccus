@@ -12,6 +12,10 @@
 
   "default_locale": "en",
 
+  "storage": {
+    "managed_schema": "managed_schema.json"
+  },
+
   "permissions": ["alarms", "bookmarks", "storage", "unlimitedStorage", "tabs", "identity"],
   "optional_permissions": ["history"],
   "host_permissions": [

@@ -45,6 +45,12 @@ export interface IAccountData {
   lastCheck?: number
   /** A check is due as soon as no other profile is syncing */
   checkScheduled?: boolean
+  /** The id of the managed policy entry this profile was created from, see ManagedPolicy.ts */
+  managedId?: string
+  /** The settings that policy sets */
+  managedKeys?: string[]
+  /** The policy doesn't let users change or delete the profile */
+  managedLocked?: boolean
   [p: string]: any
 }
 

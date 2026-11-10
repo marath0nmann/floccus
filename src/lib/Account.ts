@@ -14,6 +14,7 @@ import AsyncLock from 'async-lock'
 import CachingTreeWrapper from './CachingTreeWrapper'
 import { filterUnacceptedBookmarks } from './CacheTree'
 import { isOAuthAccount } from './AccountAuthorization'
+import { MANAGED_ACCOUNT_DATA } from './ManagedPolicy'
 import {
   ClientsideAdditionFailsafeError, ClientsideDeletionFailsafeError, FloccusError,
   InterruptedSyncError,
@@ -101,8 +102,15 @@ export default class Account {
   static async import(accounts:IAccountData[]):Promise<string[]> {
     const ids = []
     for (const accountData of accounts) {
+      const data = stripVolatileData(accountData)
+      // An imported profile is the user's own, even if it was exported from one
+      // a policy created. Keeping the marker would give the policy two profiles
+      // to recognize as the same.
+      for (const key of MANAGED_ACCOUNT_DATA) {
+        delete data[key]
+      }
       const account = await this.create({
-        ...stripVolatileData(accountData),
+        ...data,
         // OAuth refresh tokens are bound to the client_id that issued them, which
         // differs between the browser extension and the mobile app, so an imported
         // token would only ever yield E018. Make the user log in again instead.
