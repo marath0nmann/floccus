@@ -36,6 +36,13 @@
                   mdi-folder
                 </v-icon>
                 {{ folderName }}
+                <v-icon
+                  v-if="account.data.managedId"
+                  small
+                  :title="t('LabelManagedAccount')"
+                  :aria-label="t('LabelManagedAccount')">
+                  mdi-domain
+                </v-icon>
               </div>
               <div class="caption">
                 {{ uri }}

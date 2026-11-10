@@ -10,6 +10,7 @@ import random from 'random'
 import seedrandom from 'seedrandom'
 import { isVivaldi } from './BrowserDetection'
 import { LocalFolderNotFoundError } from '../../errors/Error'
+import { TLocalRootPreset } from '../ManagedPolicy'
 
 let absoluteRoot: {id: string}
 
@@ -427,6 +428,38 @@ export default class BrowserTree implements IResource<typeof ItemLocation.LOCAL>
       }
     }
     return absoluteRoot
+  }
+
+  /**
+   * The ids of the browser's built-in folders, by the names managed policies
+   * use for them (see ManagedPolicy.ts). Asked of the bookmarks API rather than
+   * assumed: Chromium has no bookmarks menu, and its ids are only conventions.
+   */
+  static async getBuiltInFolders():Promise<Partial<Record<TLocalRootPreset, string>>> {
+    const [root] = await browser.bookmarks.getTree()
+    const children = root.children || []
+    const folders: Partial<Record<TLocalRootPreset, string>> = { root: root.id }
+    const byFirefoxId = {
+      toolbar_____: 'toolbar',
+      unfiled_____: 'other',
+      menu________: 'menu',
+    }
+    for (const node of children) {
+      if (byFirefoxId[node.id]) {
+        folders[byFirefoxId[node.id]] = node.id
+      } else if (node.folderType === 'bookmarks-bar') {
+        // Chromium since 138
+        folders.toolbar = node.id
+      } else if (node.folderType === 'other') {
+        folders.other = node.id
+      }
+    }
+    if (!folders.toolbar && !folders.other && !children.some(node => byFirefoxId[node.id] || 'folderType' in node)) {
+      // Older Chromium: the bookmarks bar comes first, then other bookmarks
+      if (children[0]) folders.toolbar = children[0].id
+      if (children[1]) folders.other = children[1].id
+    }
+    return folders
   }
 
   isAvailable(): Promise<boolean> {

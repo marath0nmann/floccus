@@ -60,6 +60,10 @@ export const actionsDefinition = {
   },
   async [actions.DELETE_ACCOUNT]({commit, dispatch, state}, id) {
     const account = await Account.get(id)
+    if (account.getData().managedLocked) {
+      // The options hide the button; this is in case something else asks
+      throw new Error('This profile is managed by your organization and cannot be removed')
+    }
     await account.delete()
     commit(mutations.REMOVE_ACCOUNT, id)
   },
@@ -71,6 +75,9 @@ export const actionsDefinition = {
   async [actions.STORE_ACCOUNT]({ commit, dispatch, state }, { id,data }) {
     const account = await Account.get(id)
     const oldData = account.getData()
+    if (oldData.managedLocked) {
+      throw new Error('This profile is managed by your organization and cannot be changed')
+    }
     await account.setData(data)
     if (oldData.localRoot !== data.localRoot) {
       await account.init()
